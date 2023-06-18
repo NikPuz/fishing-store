@@ -1,0 +1,7 @@
+shutdownTimeout: 5s
+
+server:
+  port: 8080
+  writeTimeout: 10s
+  readTimeout: 10s
+  idleTimeout: 10s
