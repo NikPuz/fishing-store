@@ -1,0 +1,27 @@
+services:
+  database:
+    container_name: "test_db"
+    image: postgres
+    restart: always
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=rpass
+      - POSTGRES_DB=fishing_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  server:
+    container_name: "test_server"
+    build:
+      dockerfile: "Dockerfile"
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+
+volumes:
+  db-data:

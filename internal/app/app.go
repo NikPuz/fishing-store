@@ -6,6 +6,7 @@ import (
 	"fishing-store/internal/entity"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/nanmu42/gzip"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -20,6 +21,12 @@ func Run(ctx context.Context, cfg *config.Config) {
 
 	server := newServer(cfg.Server, router)
 	closer.Add(server.Shutdown)
+
+	db := newDataBase(cfg.DataBase)
+	err := db.Ping(ctx)
+	if err != nil {
+		panic(err.Error())
+	}
 
 	go func() {
 		logger.DPanic("ListenAndServe", zap.Any("Error", server.ListenAndServe()))
@@ -45,24 +52,24 @@ func newServer(cfg config.Server, router http.Handler) *http.Server {
 	}
 }
 
-//func newDataBase(cfg config.DataBase) *sqlx.DB {
-//
-//	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
-//
-//	db, err := sqlx.ConnectContext(ctx,
-//		"mysql",
-//		cfg.Username+":"+cfg.Password+"@"+cfg.Address+"/"+cfg.DBName+cfg.Params)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	db.SetConnMaxLifetime(cfg.MaxConnLifetime)
-//	db.SetConnMaxIdleTime(cfg.MaxConnIdleTime)
-//	db.SetMaxOpenConns(cfg.MaxOpenCons)
-//	db.SetMaxIdleConns(cfg.MaxIdleCons)
-//
-//	return db
-//}
+func newDataBase(cfg config.DataBase) *pgxpool.Pool {
+
+	pgxConfig, err := pgxpool.ParseConfig(
+		"postgres" + "://" +
+			cfg.Username + ":" + cfg.Password + "@" + cfg.Address + "/" + cfg.DBName + cfg.Params)
+	if err != nil {
+		panic(err.Error())
+	}
+	//pgLogger := zapadapter.NewLogger(logger)
+	//config.ConnConfig.Logger = pgLogger
+
+	db, err := pgxpool.ConnectConfig(context.Background(), pgxConfig)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return db
+}
 
 func newLogger() *zap.Logger {
 	cfg := zap.Config{
