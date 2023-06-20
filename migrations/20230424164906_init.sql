@@ -7,9 +7,10 @@ SET TIME ZONE 'UTC';
 --
 
 CREATE TABLE product (
-                           id int NOT NULL PRIMARY KEY,
+                           id SERIAL PRIMARY KEY,
                            name varchar(64) NOT NULL,
-                           price numeric CHECK (price > 0),
+                           price numeric NOT NULL CHECK (price > 0),
+                           stock int NOT NULL,
                            category_id int NOT NULL,
                            manufacturer_id int
                        );
@@ -22,7 +23,7 @@ CREATE INDEX product_manufacturer_id_index ON product (manufacturer_id);
 --
 
 CREATE TABLE category (
-                            id int NOT NULL PRIMARY KEY,
+                            id SERIAL PRIMARY KEY,
                             name varchar(64) NOT NULL
 );
 
@@ -31,6 +32,6 @@ CREATE TABLE category (
 --
 
 CREATE TABLE manufacturer (
-                            id int NOT NULL PRIMARY KEY,
+                            id SERIAL PRIMARY KEY,
                             name varchar(64) NOT NULL
 );

@@ -2,8 +2,12 @@ package app
 
 import (
 	"context"
+	"fishing-store/internal/api/handler"
+	"fishing-store/internal/api/httpMiddleware"
 	"fishing-store/internal/app/config"
 	"fishing-store/internal/entity"
+	"fishing-store/internal/repository"
+	"fishing-store/internal/service"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -27,6 +31,22 @@ func Run(ctx context.Context, cfg *config.Config) {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	// Repository
+	categoryRepository := repository.NewCategoryRepository(db)
+	manufacturerRepository := repository.NewManufacturerRepository(db)
+	productRepository := repository.NewProductRepository(db)
+
+	// Service
+	categoryService := service.NewCategoryService(categoryRepository)
+	manufacturerService := service.NewManufacturerService(manufacturerRepository)
+	productService := service.NewProductService(productRepository)
+
+	// API
+	middleware := httpMiddleware.NewMiddleware(logger)
+	handler.RegisterCategoryHandlers(router, categoryService, middleware)
+	handler.RegisterManufacturerHandlers(router, manufacturerService, middleware)
+	handler.RegisterProductHandlers(router, productService, middleware)
 
 	go func() {
 		logger.DPanic("ListenAndServe", zap.Any("Error", server.ListenAndServe()))
