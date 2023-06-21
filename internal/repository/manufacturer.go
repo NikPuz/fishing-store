@@ -18,7 +18,7 @@ func NewManufacturerRepository(db *pgxpool.Pool) entity.IManufacturerRepository 
 
 func (r manufacturerRepository) InsertManufacturer(ctx context.Context, manufacturer *entity.Manufacturer) error {
 
-	_, err := r.db.Exec(ctx, "insert into manufacturer(name) values ($1)", manufacturer.Name)
+	_, err := r.db.Exec(ctx, "insert into manufacturers(name) values ($1)", manufacturer.Name)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}
@@ -29,7 +29,7 @@ func (r manufacturerRepository) InsertManufacturer(ctx context.Context, manufact
 func (r manufacturerRepository) SelectManufacturer(ctx context.Context, id int) (*entity.Manufacturer, error) {
 	var manufacturer entity.Manufacturer
 
-	err := r.db.QueryRow(ctx, `SELECT id, name FROM manufacturer WHERE id = $1`, id).Scan(&manufacturer.Id, &manufacturer.Name)
+	err := r.db.QueryRow(ctx, `SELECT id, name FROM manufacturers WHERE id = $1`, id).Scan(&manufacturer.Id, &manufacturer.Name)
 	if err != nil {
 		return nil, entity.NewError(err, 500)
 	}
@@ -39,7 +39,7 @@ func (r manufacturerRepository) SelectManufacturer(ctx context.Context, id int) 
 
 func (r manufacturerRepository) UpdateManufacturer(ctx context.Context, manufacturer *entity.Manufacturer) error {
 
-	_, err := r.db.Exec(ctx, `update manufacturer set name = $1 where id = $2`, manufacturer.Name, manufacturer.Id)
+	_, err := r.db.Exec(ctx, `update manufacturers set name = $1 where id = $2`, manufacturer.Name, manufacturer.Id)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}
@@ -49,7 +49,7 @@ func (r manufacturerRepository) UpdateManufacturer(ctx context.Context, manufact
 
 func (r manufacturerRepository) DeleteManufacturer(ctx context.Context, id int) error {
 
-	_, err := r.db.Exec(ctx, `delete from manufacturer where id=$1`, id)
+	_, err := r.db.Exec(ctx, `delete from manufacturers where id=$1`, id)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}
@@ -60,7 +60,7 @@ func (r manufacturerRepository) DeleteManufacturer(ctx context.Context, id int) 
 func (r manufacturerRepository) SelectAllManufacturers(ctx context.Context) ([]entity.Manufacturer, error) {
 	var manufacturers []entity.Manufacturer
 
-	rows, err := r.db.Query(ctx, "SELECT id, name FROM manufacturer")
+	rows, err := r.db.Query(ctx, "SELECT id, name FROM manufacturers")
 	if err != nil {
 		return nil, entity.NewError(err, 500)
 	}

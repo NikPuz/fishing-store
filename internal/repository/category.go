@@ -18,7 +18,7 @@ func NewCategoryRepository(db *pgxpool.Pool) entity.ICategoryRepository {
 
 func (r categoryRepository) InsertCategory(ctx context.Context, category *entity.Category) error {
 
-	_, err := r.db.Exec(ctx, "insert into category(name) values ($1)", category.Name)
+	_, err := r.db.Exec(ctx, "insert into categories(name) values ($1)", category.Name)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}
@@ -29,7 +29,7 @@ func (r categoryRepository) InsertCategory(ctx context.Context, category *entity
 func (r categoryRepository) SelectCategory(ctx context.Context, id int) (*entity.Category, error) {
 	var category entity.Category
 
-	err := r.db.QueryRow(ctx, `SELECT id, name FROM category WHERE id = $1`, id).Scan(&category.Id, &category.Name)
+	err := r.db.QueryRow(ctx, `SELECT id, name FROM categories WHERE id = $1`, id).Scan(&category.Id, &category.Name)
 	if err != nil {
 		return nil, entity.NewError(err, 500)
 	}
@@ -39,7 +39,7 @@ func (r categoryRepository) SelectCategory(ctx context.Context, id int) (*entity
 
 func (r categoryRepository) UpdateCategory(ctx context.Context, category *entity.Category) error {
 
-	_, err := r.db.Exec(ctx, `update category set name = $1 where id = $2`, category.Name, category.Id)
+	_, err := r.db.Exec(ctx, `update categories set name = $1 where id = $2`, category.Name, category.Id)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}
@@ -49,7 +49,7 @@ func (r categoryRepository) UpdateCategory(ctx context.Context, category *entity
 
 func (r categoryRepository) DeleteCategory(ctx context.Context, id int) error {
 
-	_, err := r.db.Exec(ctx, `delete from category where id=$1`, id)
+	_, err := r.db.Exec(ctx, `delete from categories where id=$1`, id)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}
@@ -60,7 +60,7 @@ func (r categoryRepository) DeleteCategory(ctx context.Context, id int) error {
 func (r categoryRepository) SelectAllCategories(ctx context.Context) ([]entity.Category, error) {
 	var categories []entity.Category
 
-	rows, err := r.db.Query(ctx, "SELECT id, name FROM category")
+	rows, err := r.db.Query(ctx, "SELECT id, name FROM categories")
 	if err != nil {
 		return nil, entity.NewError(err, 500)
 	}

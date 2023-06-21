@@ -36,17 +36,23 @@ func Run(ctx context.Context, cfg *config.Config) {
 	categoryRepository := repository.NewCategoryRepository(db)
 	manufacturerRepository := repository.NewManufacturerRepository(db)
 	productRepository := repository.NewProductRepository(db)
+	supplyRepository := repository.NewSupplyRepository(db)
+	saleRepository := repository.NewSaleRepository(db)
 
 	// Service
 	categoryService := service.NewCategoryService(categoryRepository)
 	manufacturerService := service.NewManufacturerService(manufacturerRepository)
 	productService := service.NewProductService(productRepository)
+	supplyService := service.NewSupplyService(supplyRepository, productRepository)
+	saleService := service.NewSaleService(saleRepository, productRepository)
 
 	// API
 	middleware := httpMiddleware.NewMiddleware(logger)
 	handler.RegisterCategoryHandlers(router, categoryService, middleware)
 	handler.RegisterManufacturerHandlers(router, manufacturerService, middleware)
 	handler.RegisterProductHandlers(router, productService, middleware)
+	handler.RegisterSupplyHandlers(router, supplyService, middleware)
+	handler.RegisterSaleHandlers(router, saleService, middleware)
 
 	go func() {
 		logger.DPanic("ListenAndServe", zap.Any("Error", server.ListenAndServe()))
