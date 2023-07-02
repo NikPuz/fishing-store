@@ -61,3 +61,65 @@ func (r saleRepository) TxInsertSaleItems(ctx context.Context, tx pgx.Tx, saleId
 
 	return nil
 }
+
+func (r saleRepository) SelectAllSales(ctx context.Context) ([]entity.Sale, error) {
+	var sales []entity.Sale
+
+	rows, err := r.db.Query(ctx, `SELECT s.id, s.sum, s.cashier_id, s.date FROM sales s`)
+	if err != nil {
+		return nil, entity.NewError(err, 500)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var sale entity.Sale
+		err = rows.Scan(
+			&sale.Id,
+			&sale.Sum,
+			&sale.CashierId,
+			&sale.Date,
+		)
+		if err != nil {
+			return nil, entity.NewError(err, 500)
+		}
+
+		sales = append(sales, sale)
+	}
+
+	return sales, nil
+}
+
+func (r saleRepository) SelectAllSaleItemsMap(ctx context.Context) (map[int][]entity.SaleItem, error) {
+	saleItems := make(map[int][]entity.SaleItem)
+
+	rows, err := r.db.Query(ctx, `SELECT s.id, s.sale_id, s.product_id, p.name, s.unit_price, s.count FROM sales_items s
+LEFT JOIN products p ON p.id = s.product_id`)
+	if err != nil {
+		return nil, entity.NewError(err, 500)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var saleItem entity.SaleItem
+		var id int
+		err = rows.Scan(
+			&saleItem.Id,
+			&id,
+			&saleItem.ProductId,
+			&saleItem.ProductName,
+			&saleItem.UnitPrice,
+			&saleItem.Count,
+		)
+		if err != nil {
+			return nil, entity.NewError(err, 500)
+		}
+
+		if _, ok := saleItems[id]; ok {
+			saleItems[id] = append(saleItems[id], saleItem)
+		} else {
+			saleItems[id] = []entity.SaleItem{saleItem}
+		}
+	}
+
+	return saleItems, nil
+}

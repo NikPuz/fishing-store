@@ -11,7 +11,7 @@ CREATE TABLE products (
                            price int NOT NULL CHECK (price > 0),
                            stock int NOT NULL,
                            category_id int NOT NULL,
-                           manufacturer_id int
+                           manufacturer_id int NOT NULL
                        );
 
 CREATE INDEX product_category_id_index ON products (category_id);

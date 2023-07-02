@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"fishing-store/internal/api/httpMiddleware"
 	"fishing-store/internal/entity"
 	"github.com/go-chi/chi/v5"
@@ -41,7 +40,7 @@ func (h categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request) 
 	err := json.NewDecoder(r.Body).Decode(&category)
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -68,7 +67,7 @@ func (h categoryHandler) ReadCategory(w http.ResponseWriter, r *http.Request) ([
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -99,7 +98,7 @@ func (h categoryHandler) UpdateCategory(w http.ResponseWriter, r *http.Request) 
 	err := json.NewDecoder(r.Body).Decode(&category)
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -126,7 +125,7 @@ func (h categoryHandler) DeleteCategory(w http.ResponseWriter, r *http.Request) 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)

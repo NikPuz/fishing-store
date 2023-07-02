@@ -7,11 +7,13 @@ import (
 
 type categoryService struct {
 	categoryRepo entity.ICategoryRepository
+	productRepo  entity.IProductRepository
 }
 
-func NewCategoryService(categoryRepo entity.ICategoryRepository) entity.ICategoryService {
+func NewCategoryService(categoryRepo entity.ICategoryRepository, productRepo entity.IProductRepository) entity.ICategoryService {
 	categoryService := new(categoryService)
 	categoryService.categoryRepo = categoryRepo
+	categoryService.productRepo = productRepo
 	return categoryService
 }
 
@@ -28,7 +30,12 @@ func (s categoryService) UpdateCategory(ctx context.Context, category *entity.Ca
 }
 
 func (s categoryService) DeleteCategory(ctx context.Context, id int) error {
-	return s.categoryRepo.DeleteCategory(ctx, id)
+	err := s.categoryRepo.DeleteCategory(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return s.productRepo.SetDefaultCategoryByCategoryId(ctx, id)
 }
 
 func (s categoryService) ReadCategories(ctx context.Context) ([]entity.Category, error) {

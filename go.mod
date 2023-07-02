@@ -3,11 +3,10 @@ module fishing-store
 go 1.20
 
 require (
-	github.com/bwmarrin/discordgo v0.27.1
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/go-sql-driver/mysql v1.7.1
-	github.com/jmoiron/sqlx v1.3.5
+	github.com/jackc/pgx/v4 v4.18.1
 	github.com/nanmu42/gzip v1.2.0
 	github.com/spf13/viper v1.16.0
 	go.uber.org/zap v1.24.0
@@ -21,7 +20,6 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.0 // indirect
@@ -30,7 +28,6 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
-	github.com/jackc/pgx/v4 v4.18.1 // indirect
 	github.com/jackc/puddle v1.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect

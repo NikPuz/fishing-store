@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"fishing-store/internal/api/httpMiddleware"
 	"fishing-store/internal/entity"
 	"github.com/go-chi/chi/v5"
@@ -41,7 +40,7 @@ func (h manufacturerHandler) CreateManufacturer(w http.ResponseWriter, r *http.R
 	err := json.NewDecoder(r.Body).Decode(&manufacturer)
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -68,7 +67,7 @@ func (h manufacturerHandler) ReadManufacturer(w http.ResponseWriter, r *http.Req
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -99,7 +98,7 @@ func (h manufacturerHandler) UpdateManufacturer(w http.ResponseWriter, r *http.R
 	err := json.NewDecoder(r.Body).Decode(&manufacturer)
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -126,7 +125,7 @@ func (h manufacturerHandler) DeleteManufacturer(w http.ResponseWriter, r *http.R
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)

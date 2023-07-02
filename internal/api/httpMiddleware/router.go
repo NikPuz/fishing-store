@@ -99,8 +99,9 @@ func (m *middleware) RequestLogger(next func(w http.ResponseWriter, r *http.Requ
 			)
 		} else {
 			fields = append(fields, []zapcore.Field{
-				zap.String("LogicError", logicError.Error()),
-				zap.String("StackTrace", logicError.StackTrace)}...)
+				zap.String("LogicError", logicError.Error())}...,
+			//zap.String("StackTrace", logicError.StackTrace)
+			)
 
 			m.logger.Error("Request Logger",
 				fields...,

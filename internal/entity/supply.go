@@ -7,17 +7,29 @@ import (
 )
 
 type ISupplyService interface {
-	CreateSupplies(ctx context.Context, supplies []Supply) error
+	CreateSupply(ctx context.Context, supply *Supply) (*Supply, error)
+	ReadSupplies(ctx context.Context) ([]SupplyResponse, error)
 }
 
 type ISupplyRepository interface {
-	TxInsertSupplies(ctx context.Context, tx pgx.Tx, supplies []Supply) error
+	TxInsertSupply(ctx context.Context, tx pgx.Tx, supply *Supply) (*Supply, error)
+	SelectAllSupplies(ctx context.Context) ([]SupplyResponse, error)
 }
 
 type Supply struct {
 	Id        int       `json:"id"`
-	ProductId int       `json:"product_id"`
-	UnitPrice int       `json:"unit_price"`
+	ProductId int       `json:"productId"`
+	UnitPrice int       `json:"unitPrice"`
 	Count     int       `json:"count"`
 	Date      time.Time `json:"date"`
+}
+
+type SupplyResponse struct {
+	Id                  int       `json:"id"`
+	ProductName         *string   `json:"productName"`
+	ProductCategory     *string   `json:"productCategory"`
+	ProductManufacturer *string   `json:"productManufacturer"`
+	UnitPrice           int       `json:"unitPrice"`
+	Count               int       `json:"count"`
+	Date                time.Time `json:"date"`
 }

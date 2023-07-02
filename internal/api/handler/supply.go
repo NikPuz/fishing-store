@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"fishing-store/internal/api/httpMiddleware"
 	"fishing-store/internal/entity"
 	"github.com/go-chi/chi/v5"
@@ -26,23 +25,24 @@ func RegisterSupplyHandlers(r *chi.Mux, service entity.ISupplyService, routerMid
 		r.Use(routerMiddleware.ContentTypeJSON)
 
 		r.Post("/", routerMiddleware.RequestLogger(supplyHandler.CreateSupply))
+		r.Get("/", routerMiddleware.RequestLogger(supplyHandler.ReadSupplies))
 	})
 }
 
 func (h supplyHandler) CreateSupply(w http.ResponseWriter, r *http.Request) ([]byte, int, *entity.LogicError) {
 
-	var supplies []entity.Supply
-	err := json.NewDecoder(r.Body).Decode(&supplies)
+	var supply entity.Supply
+	err := json.NewDecoder(r.Body).Decode(&supply)
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
 		return resp, logicError.Code, logicError
 	}
 
-	err = h.supplyService.CreateSupplies(r.Context(), supplies)
+	respSupply, err := h.supplyService.CreateSupply(r.Context(), &supply)
 
 	// Обработка ошибки
 	if err != nil {
@@ -53,6 +53,29 @@ func (h supplyHandler) CreateSupply(w http.ResponseWriter, r *http.Request) ([]b
 		return resp, logicError.Code, logicError
 	}
 
+	resp, _ := json.Marshal(respSupply)
+
 	w.WriteHeader(http.StatusCreated)
+	w.Write(resp)
 	return nil, http.StatusCreated, nil
+}
+
+func (h supplyHandler) ReadSupplies(w http.ResponseWriter, r *http.Request) ([]byte, int, *entity.LogicError) {
+
+	supplies, err := h.supplyService.ReadSupplies(r.Context())
+
+	// Обработка ошибки
+	if err != nil {
+		logicError := entity.ResponseLogicError(err)
+		resp := logicError.JsonMarshal()
+		w.WriteHeader(logicError.Code)
+		w.Write(resp)
+		return resp, logicError.Code, logicError
+	}
+
+	resp, _ := json.Marshal(supplies)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+	return resp, http.StatusOK, nil
 }

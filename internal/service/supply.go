@@ -17,29 +17,31 @@ func NewSupplyService(supplyRepo entity.ISupplyRepository, productRepo entity.IP
 	return supplyService
 }
 
-func (s supplyService) CreateSupplies(ctx context.Context, supplies []entity.Supply) error {
+func (s supplyService) CreateSupply(ctx context.Context, supply *entity.Supply) (*entity.Supply, error) {
 	tx, err := s.productRepo.GetTx(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer tx.Rollback(ctx)
 
-	for _, supply := range supplies {
-		err = s.productRepo.TxUpdateProductAddStock(ctx, tx, supply.ProductId, supply.Count)
-		if err != nil {
-			return err
-		}
+	supply, err = s.supplyRepo.TxInsertSupply(ctx, tx, supply)
+	if err != nil {
+		return nil, err
 	}
 
-	err = s.supplyRepo.TxInsertSupplies(ctx, tx, supplies)
+	err = s.productRepo.TxUpdateProductAddStock(ctx, tx, supply.ProductId, supply.Count)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = tx.Commit(ctx)
 	if err != nil {
-		return entity.NewError(err, 500)
+		return nil, entity.NewError(err, 500)
 	}
 
-	return nil
+	return supply, nil
+}
+
+func (s supplyService) ReadSupplies(ctx context.Context) ([]entity.SupplyResponse, error) {
+	return s.supplyRepo.SelectAllSupplies(ctx)
 }

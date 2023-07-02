@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"fishing-store/internal/api/httpMiddleware"
 	"fishing-store/internal/entity"
 	"github.com/go-chi/chi/v5"
@@ -26,6 +25,7 @@ func RegisterSaleHandlers(r *chi.Mux, service entity.ISaleService, routerMiddlew
 		r.Use(routerMiddleware.ContentTypeJSON)
 
 		r.Post("/", routerMiddleware.RequestLogger(saleHandler.CreateSale))
+		r.Get("/", routerMiddleware.RequestLogger(saleHandler.ReadSales))
 	})
 }
 
@@ -35,7 +35,7 @@ func (h saleHandler) CreateSale(w http.ResponseWriter, r *http.Request) ([]byte,
 	err := json.NewDecoder(r.Body).Decode(&sales)
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -55,4 +55,24 @@ func (h saleHandler) CreateSale(w http.ResponseWriter, r *http.Request) ([]byte,
 
 	w.WriteHeader(http.StatusCreated)
 	return nil, http.StatusCreated, nil
+}
+
+func (h saleHandler) ReadSales(w http.ResponseWriter, r *http.Request) ([]byte, int, *entity.LogicError) {
+
+	sales, err := h.saleService.ReadSales(r.Context())
+
+	// Обработка ошибки
+	if err != nil {
+		logicError := entity.ResponseLogicError(err)
+		resp := logicError.JsonMarshal()
+		w.WriteHeader(logicError.Code)
+		w.Write(resp)
+		return resp, logicError.Code, logicError
+	}
+
+	resp, _ := json.Marshal(sales)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+	return resp, http.StatusOK, nil
 }

@@ -40,8 +40,8 @@ func Run(ctx context.Context, cfg *config.Config) {
 	saleRepository := repository.NewSaleRepository(db)
 
 	// Service
-	categoryService := service.NewCategoryService(categoryRepository)
-	manufacturerService := service.NewManufacturerService(manufacturerRepository)
+	categoryService := service.NewCategoryService(categoryRepository, productRepository)
+	manufacturerService := service.NewManufacturerService(manufacturerRepository, productRepository)
 	productService := service.NewProductService(productRepository)
 	supplyService := service.NewSupplyService(supplyRepository, productRepository)
 	saleService := service.NewSaleService(saleRepository, productRepository)

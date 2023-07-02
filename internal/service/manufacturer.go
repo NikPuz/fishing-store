@@ -7,11 +7,13 @@ import (
 
 type manufacturerService struct {
 	manufacturerRepo entity.IManufacturerRepository
+	productRepo      entity.IProductRepository
 }
 
-func NewManufacturerService(manufacturerRepo entity.IManufacturerRepository) entity.IManufacturerService {
+func NewManufacturerService(manufacturerRepo entity.IManufacturerRepository, productRepo entity.IProductRepository) entity.IManufacturerService {
 	manufacturerService := new(manufacturerService)
 	manufacturerService.manufacturerRepo = manufacturerRepo
+	manufacturerService.productRepo = productRepo
 	return manufacturerService
 }
 
@@ -28,7 +30,12 @@ func (s manufacturerService) UpdateManufacturer(ctx context.Context, manufacture
 }
 
 func (s manufacturerService) DeleteManufacturer(ctx context.Context, id int) error {
-	return s.manufacturerRepo.DeleteManufacturer(ctx, id)
+	err := s.manufacturerRepo.DeleteManufacturer(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return s.productRepo.SetDefaultManufacturerByManufacturerId(ctx, id)
 }
 
 func (s manufacturerService) ReadManufacturers(ctx context.Context) ([]entity.Manufacturer, error) {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"fishing-store/internal/api/httpMiddleware"
 	"fishing-store/internal/entity"
 	"github.com/go-chi/chi/v5"
@@ -40,14 +39,14 @@ func (h productHandler) CreateProduct(w http.ResponseWriter, r *http.Request) ([
 	err := json.NewDecoder(r.Body).Decode(&product)
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
 		return resp, logicError.Code, logicError
 	}
 
-	err = h.productService.CreateProduct(r.Context(), &product)
+	respProduct, err := h.productService.CreateProduct(r.Context(), &product)
 
 	// Обработка ошибки
 	if err != nil {
@@ -58,7 +57,10 @@ func (h productHandler) CreateProduct(w http.ResponseWriter, r *http.Request) ([
 		return resp, logicError.Code, logicError
 	}
 
+	resp, _ := json.Marshal(respProduct)
+
 	w.WriteHeader(http.StatusCreated)
+	w.Write(resp)
 	return nil, http.StatusCreated, nil
 }
 
@@ -67,7 +69,7 @@ func (h productHandler) ReadProduct(w http.ResponseWriter, r *http.Request) ([]b
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -98,7 +100,7 @@ func (h productHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) ([
 	err := json.NewDecoder(r.Body).Decode(&product)
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)
@@ -125,7 +127,7 @@ func (h productHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) ([
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 
 	if err != nil {
-		logicError := entity.NewLogicError(errors.New("входные данные не распознаны"), http.StatusBadRequest)
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
 		resp := logicError.JsonMarshal()
 		w.WriteHeader(logicError.Code)
 		w.Write(resp)

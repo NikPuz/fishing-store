@@ -53,3 +53,31 @@ func (s saleService) CreateSale(ctx context.Context, sales *entity.SaleDTO) erro
 
 	return nil
 }
+
+func (s saleService) ReadSales(ctx context.Context) ([]entity.SaleResponse, error) {
+
+	var respSales []entity.SaleResponse
+
+	saleItems, err := s.saleRepo.SelectAllSaleItemsMap(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	sales, err := s.saleRepo.SelectAllSales(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, sale := range sales {
+		respSales = append(respSales,
+			entity.SaleResponse{
+				Id:        sale.Id,
+				Sum:       sale.Sum,
+				CashierId: sale.CashierId,
+				Date:      sale.Date,
+				SaleItems: saleItems[sale.Id],
+			})
+	}
+
+	return respSales, nil
+}
