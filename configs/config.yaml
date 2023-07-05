@@ -1,7 +1,7 @@
 shutdownTimeout: 5s
 
 server:
-  port: 8080
+  port: 8088
   writeTimeout: 10s
   readTimeout: 10s
   idleTimeout: 10s
@@ -9,7 +9,7 @@ server:
 dataBase:
   username: 'root'
   password: 'rpass'
-  address: 'localhost:5432'
+  address: 'test_db:5432'
   dBName: 'fishing_db'
   params: '?pool_max_conns=10&pool_max_conn_lifetime=3m&prefer_simple_protocol=true'
   maxConnLifetime: 3m
