@@ -29,6 +29,7 @@ type Product struct {
 	Id             int    `json:"id"`
 	Name           string `json:"name"`
 	Price          int    `json:"price"`
+	Description    string `json:"description"`
 	Stock          int    `json:"stock"`
 	CategoryId     int    `json:"categoryId"`
 	ManufacturerId int    `json:"manufacturerId"`
@@ -38,6 +39,7 @@ type ProductResponse struct {
 	Id           int    `json:"id"`
 	Name         string `json:"name"`
 	Price        int    `json:"price"`
+	Description  string `json:"description"`
 	Stock        int    `json:"stock"`
 	Category     string `json:"category"`
 	Manufacturer string `json:"manufacturer"`

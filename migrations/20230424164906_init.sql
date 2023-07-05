@@ -9,6 +9,7 @@ CREATE TABLE products (
                            id SERIAL PRIMARY KEY,
                            name varchar(64) NOT NULL,
                            price int NOT NULL CHECK (price > 0),
+                           description varchar(128) NOT NULL,
                            stock int NOT NULL,
                            category_id int NOT NULL,
                            manufacturer_id int NOT NULL
