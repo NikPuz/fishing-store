@@ -18,6 +18,7 @@ services:
   server:
     container_name: "test_server"
     build:
+      context: .
       dockerfile: "Dockerfile"
     restart: always
     ports:
