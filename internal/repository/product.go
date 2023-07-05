@@ -28,7 +28,7 @@ func (r productRepository) GetTx(ctx context.Context) (pgx.Tx, error) {
 
 func (r productRepository) InsertProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
 
-	err := r.db.QueryRow(ctx, "insert into products(name, price, stock, description, category_id, manufacturer_id) values ($1, $2, $3, $4, $5) returning id",
+	err := r.db.QueryRow(ctx, "insert into products(name, price, stock, description, category_id, manufacturer_id) values ($1, $2, $3, $4, $5, $6) returning id",
 		product.Name, product.Price, product.Stock, product.Description, product.CategoryId, product.ManufacturerId).Scan(
 		&product.Id)
 	if err != nil {
