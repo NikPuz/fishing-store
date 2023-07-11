@@ -28,8 +28,8 @@ func (r productRepository) GetTx(ctx context.Context) (pgx.Tx, error) {
 
 func (r productRepository) InsertProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
 
-	err := r.db.QueryRow(ctx, "insert into products(name, price, stock, description, category_id, manufacturer_id) values ($1, $2, $3, $4, $5, $6) returning id",
-		product.Name, product.Price, product.Stock, product.Description, product.CategoryId, product.ManufacturerId).Scan(
+	err := r.db.QueryRow(ctx, "insert into products(name, price, barcode, stock, description, category_id, manufacturer_id) values ($1, $2, $3, $4, $5, $6, $7) returning id",
+		product.Name, product.Price, product.Barcode, product.Stock, product.Description, product.CategoryId, product.ManufacturerId).Scan(
 		&product.Id)
 	if err != nil {
 		return nil, entity.NewError(err, 500)
@@ -42,11 +42,11 @@ func (r productRepository) SelectProduct(ctx context.Context, id int) (*entity.P
 	var product entity.ProductResponse
 
 	err := r.db.QueryRow(ctx,
-		`SELECT p.id, p.name, p.price, p.description, p.stock, c.name, p.name FROM products p
+		`SELECT p.id, p.name, p.price, p.barcode, p.description, p.stock, c.name, p.name FROM products p
 LEFT JOIN categories c ON c.id = p.category_id
 LEFT JOIN manufacturers m ON m.id = p.manufacturer_id
 WHERE p.id = $1`, id).Scan(
-		&product.Id, &product.Name, &product.Price, &product.Description, &product.Stock, &product.Category, &product.Manufacturer)
+		&product.Id, &product.Name, &product.Price, &product.Barcode, &product.Description, &product.Stock, &product.Category, &product.Manufacturer)
 	if err != nil {
 		return nil, entity.NewError(err, 500)
 	}
@@ -57,8 +57,8 @@ WHERE p.id = $1`, id).Scan(
 func (r productRepository) UpdateProduct(ctx context.Context, product *entity.Product) error {
 
 	_, err := r.db.Exec(ctx,
-		`update products set name = $2, price = $3, description = $4, stock = $5, category_id = $6, manufacturer_id = $7 where id = $1`,
-		product.Id, product.Name, product.Price, product.Description, product.Stock, product.CategoryId, product.ManufacturerId)
+		`update products set name = $2, price = $3, barcode = $4, description = $5, stock = $6, category_id = $7, manufacturer_id = $8 where id = $1`,
+		product.Id, product.Name, product.Price, product.Barcode, product.Description, product.Stock, product.CategoryId, product.ManufacturerId)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}
@@ -79,7 +79,7 @@ func (r productRepository) DeleteProduct(ctx context.Context, id int) error {
 func (r productRepository) SelectAllProducts(ctx context.Context) ([]entity.ProductResponse, error) {
 	var products []entity.ProductResponse
 
-	rows, err := r.db.Query(ctx, `SELECT p.id, p.name, p.price, p.description, p.stock, c.name, m.name FROM products p
+	rows, err := r.db.Query(ctx, `SELECT p.id, p.name, p.price, p.barcode, p.description, p.stock, c.name, m.name FROM products p
 LEFT JOIN categories c ON c.id = p.category_id
 LEFT JOIN manufacturers m ON m.id = p.manufacturer_id`)
 	if err != nil {
@@ -93,6 +93,7 @@ LEFT JOIN manufacturers m ON m.id = p.manufacturer_id`)
 			&product.Id,
 			&product.Name,
 			&product.Price,
+			&product.Barcode,
 			&product.Description,
 			&product.Stock,
 			&product.Category,
@@ -129,6 +130,27 @@ func (r productRepository) SetDefaultManufacturerByManufacturerId(ctx context.Co
 
 func (r productRepository) SetDefaultCategoryByCategoryId(ctx context.Context, id int) error {
 	_, err := r.db.Exec(ctx, `update products set category_id = 0 where category_id = $1`, id)
+	if err != nil {
+		return entity.NewError(err, 500)
+	}
+
+	return nil
+}
+
+func (r productRepository) TxInsertProduct(ctx context.Context, tx pgx.Tx, product *entity.Product) (*entity.Product, error) {
+	err := tx.QueryRow(ctx, "insert into products(name, price, barcode, stock, description, category_id, manufacturer_id) values ($1, $2, $3, $4, $5, $6, $7) returning id",
+		product.Name, product.Price, product.Barcode, product.Stock, product.Description, product.CategoryId, product.ManufacturerId).Scan(
+		&product.Id)
+	if err != nil {
+		return nil, entity.NewError(err, 500)
+	}
+
+	return product, nil
+}
+
+func (r productRepository) TxUpdateBarcode(ctx context.Context, tx pgx.Tx, id, barcode int) error {
+
+	_, err := tx.Exec(ctx, `update products set barcode = $2 where id = $1`, id, barcode)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}

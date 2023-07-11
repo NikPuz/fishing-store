@@ -19,6 +19,6 @@ type IManufacturerRepository interface {
 }
 
 type Manufacturer struct {
-	Id   int     `json:"id"`
-	Name *string `json:"name"`
+	Id   int    `json:"id"`
+	Name string `json:"name"`
 }

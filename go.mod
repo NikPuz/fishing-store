@@ -8,6 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/nanmu42/gzip v1.2.0
+	github.com/nicholassm/go-ean v0.0.0-20160503113020-c3635ff48801
 	github.com/spf13/viper v1.16.0
 	go.uber.org/zap v1.24.0
 )

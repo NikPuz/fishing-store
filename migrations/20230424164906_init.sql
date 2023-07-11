@@ -11,6 +11,7 @@ CREATE TABLE products (
                            price int NOT NULL CHECK (price > 0),
                            description varchar(128) NOT NULL,
                            stock int NOT NULL,
+                           barcode bigint not null,
                            category_id int NOT NULL,
                            manufacturer_id int NOT NULL
                        );
