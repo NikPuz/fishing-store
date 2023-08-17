@@ -31,8 +31,8 @@ func RegisterSupplyHandlers(r *chi.Mux, service entity.ISupplyService, routerMid
 
 func (h supplyHandler) CreateSupply(w http.ResponseWriter, r *http.Request) ([]byte, int, *entity.LogicError) {
 
-	var supply entity.Supply
-	err := json.NewDecoder(r.Body).Decode(&supply)
+	var supplyItems []entity.SupplyItem
+	err := json.NewDecoder(r.Body).Decode(&supplyItems)
 
 	if err != nil {
 		logicError := entity.NewLogicError(err, http.StatusBadRequest)
@@ -42,7 +42,7 @@ func (h supplyHandler) CreateSupply(w http.ResponseWriter, r *http.Request) ([]b
 		return resp, logicError.Code, logicError
 	}
 
-	respSupply, err := h.supplyService.CreateSupply(r.Context(), &supply)
+	respSupply, err := h.supplyService.CreateSupply(r.Context(), supplyItems)
 
 	// Обработка ошибки
 	if err != nil {

@@ -72,12 +72,25 @@ CREATE INDEX sales_items_sale_id_index ON sales_items (sale_id);
 --
 
 CREATE TABLE supplies (
-                             id SERIAL PRIMARY KEY,
-                             product_id int NOT NULL,
-                             unit_price int NOT NULL CHECK (unit_price > 0),
-                             count int NOT NULL,
-                             date timestamptz default current_timestamp
+                       id SERIAL PRIMARY KEY,
+                       sum int NOT NULL CHECK (sum > 0),
+                       date timestamptz default current_timestamp
 );
 
-CREATE INDEX supplies_product_id_index ON supplies (product_id);
 CREATE INDEX supplies_date_index ON supplies (date);
+
+--
+-- таблица `supplies_items`
+--
+
+CREATE TABLE supplies_items (
+                             id SERIAL PRIMARY KEY,
+                             supply_id int NOT NULL,
+                             product_id int,
+                             unit_price int NOT NULL CHECK (unit_price > 0),
+                             count int NOT NULL
+
+);
+
+CREATE INDEX supplies_items_product_id_index ON supplies_items (product_id);
+CREATE INDEX supplies_items_supply_id_index ON supplies_items (supply_id);
