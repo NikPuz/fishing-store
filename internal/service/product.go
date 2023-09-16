@@ -18,7 +18,7 @@ func NewProductService(productRepo entity.IProductRepository) entity.IProductSer
 }
 
 func (s productService) CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
-	if product != nil && product.Barcode == 0 {
+	if len(product.Barcode) == 0 {
 		tx, err := s.productRepo.GetTx(ctx)
 		if err != nil {
 			return nil, entity.NewError(err, 500)
@@ -36,10 +36,7 @@ func (s productService) CreateProduct(ctx context.Context, product *entity.Produ
 			return nil, entity.NewError(err, 500)
 		}
 
-		barcode, err := strconv.Atoi("460" + "0000" + eanProductId + strconv.Itoa(code))
-		if err != nil {
-			return nil, entity.NewError(err, 500)
-		}
+		barcode := "460" + "0000" + eanProductId + strconv.Itoa(code)
 
 		// Записываем Штрихкод
 		err = s.productRepo.TxUpdateBarcode(ctx, tx, product.Id, barcode)
@@ -63,7 +60,7 @@ func (s productService) ReadProduct(ctx context.Context, id int) (*entity.Produc
 }
 
 func (s productService) UpdateProduct(ctx context.Context, product *entity.Product) error {
-	if product != nil && product.Barcode == 0 {
+	if len(product.Barcode) == 0 {
 		eanProductId := "00000"[len(strconv.Itoa(product.Id)):] + strconv.Itoa(product.Id)
 
 		code, err := ean.ChecksumEan13("460" + "0000" + eanProductId + "0")
@@ -71,10 +68,7 @@ func (s productService) UpdateProduct(ctx context.Context, product *entity.Produ
 			return entity.NewError(err, 500)
 		}
 
-		barcode, err := strconv.Atoi("460" + "0000" + eanProductId + strconv.Itoa(code))
-		if err != nil {
-			return entity.NewError(err, 500)
-		}
+		barcode := "460" + "0000" + eanProductId + strconv.Itoa(code)
 
 		product.Barcode = barcode
 	}

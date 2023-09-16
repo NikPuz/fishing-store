@@ -22,7 +22,7 @@ type IProductRepository interface {
 	SelectAllProducts(ctx context.Context) ([]ProductResponse, error)
 	TxUpdateProductAddStock(ctx context.Context, tx pgx.Tx, id, addStock int) error
 	TxInsertProduct(ctx context.Context, tx pgx.Tx, product *Product) (*Product, error)
-	TxUpdateBarcode(ctx context.Context, tx pgx.Tx, id, barcode int) error
+	TxUpdateBarcode(ctx context.Context, tx pgx.Tx, id int, barcode string) error
 	SetDefaultManufacturerByManufacturerId(ctx context.Context, id int) error
 	SetDefaultCategoryByCategoryId(ctx context.Context, id int) error
 }
@@ -32,7 +32,7 @@ type Product struct {
 	Name           string `json:"name"`
 	Price          int    `json:"price"`
 	Description    string `json:"description"`
-	Barcode        int    `json:"barcode"`
+	Barcode        string `json:"barcode"`
 	Stock          int    `json:"stock"`
 	CategoryId     int    `json:"categoryId"`
 	ManufacturerId int    `json:"manufacturerId"`
@@ -43,7 +43,7 @@ type ProductResponse struct {
 	Name         string `json:"name"`
 	Price        int    `json:"price"`
 	Description  string `json:"description"`
-	Barcode      int    `json:"barcode"`
+	Barcode      string `json:"barcode"`
 	Stock        int    `json:"stock"`
 	Category     string `json:"category"`
 	Manufacturer string `json:"manufacturer"`

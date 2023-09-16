@@ -42,7 +42,7 @@ type SupplyItemResponse struct {
 
 type SupplyResponse struct {
 	Id          int                  `json:"id"`
-	SupplyItems []SupplyItemResponse `json:"supplyItems"`
+	SupplyItems []SupplyItemResponse `json:"items"`
 	Sum         int                  `json:"sum"`
 	Date        time.Time            `json:"date"`
 }

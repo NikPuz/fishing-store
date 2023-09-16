@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fishing-store/internal/entity"
-	"fmt"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -19,7 +18,7 @@ func NewSupplyRepository(db *pgxpool.Pool) entity.ISupplyRepository {
 }
 
 func (r supplyRepository) TxInsertSupply(ctx context.Context, tx pgx.Tx, supply *entity.Supply) (*entity.Supply, error) {
-	fmt.Println(supply.Sum)
+
 	err := tx.QueryRow(ctx, "insert into supplies(sum) values ($1) returning id",
 		supply.Sum).Scan(
 		&supply.Id)

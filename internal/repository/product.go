@@ -148,7 +148,7 @@ func (r productRepository) TxInsertProduct(ctx context.Context, tx pgx.Tx, produ
 	return product, nil
 }
 
-func (r productRepository) TxUpdateBarcode(ctx context.Context, tx pgx.Tx, id, barcode int) error {
+func (r productRepository) TxUpdateBarcode(ctx context.Context, tx pgx.Tx, id int, barcode string) error {
 
 	_, err := tx.Exec(ctx, `update products set barcode = $2 where id = $1`, id, barcode)
 	if err != nil {
