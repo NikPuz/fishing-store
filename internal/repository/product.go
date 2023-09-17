@@ -77,7 +77,7 @@ func (r productRepository) DeleteProduct(ctx context.Context, id int) error {
 }
 
 func (r productRepository) SelectAllProducts(ctx context.Context) ([]entity.ProductResponse, error) {
-	var products []entity.ProductResponse
+	products := make([]entity.ProductResponse, 0)
 
 	rows, err := r.db.Query(ctx, `SELECT p.id, p.name, p.price, p.barcode, p.description, p.stock, c.name, m.name FROM products p
 LEFT JOIN categories c ON c.id = p.category_id

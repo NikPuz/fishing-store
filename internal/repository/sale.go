@@ -29,7 +29,7 @@ func (r saleRepository) GetTx(ctx context.Context) (pgx.Tx, error) {
 func (r saleRepository) TxInsertSale(ctx context.Context, tx pgx.Tx, sale *entity.Sale) (int, error) {
 	var id int
 
-	rows, err := tx.Query(ctx, "insert into sales(sum, cashier_id) values ($1, $2) returning id", sale.Sum, sale.CashierId)
+	rows, err := tx.Query(ctx, "insert into sales(sum, cashier_id, pay_type, refund) values ($1, $2, $3, false) returning id", sale.Sum, sale.CashierId, sale.PayType)
 	if err != nil {
 		return 0, entity.NewError(err, 500)
 	}
@@ -43,6 +43,16 @@ func (r saleRepository) TxInsertSale(ctx context.Context, tx pgx.Tx, sale *entit
 	}
 
 	return id, nil
+}
+
+func (r saleRepository) UpdateRefund(ctx context.Context, id int, isRefund bool) error {
+
+	_, err := r.db.Exec(ctx, `update sales set refund = $2 where id = $1`, id, isRefund)
+	if err != nil {
+		return entity.NewError(err, 500)
+	}
+
+	return nil
 }
 
 func (r saleRepository) TxInsertSaleItems(ctx context.Context, tx pgx.Tx, saleId int, saleItems []entity.SaleItem) error {
@@ -65,7 +75,7 @@ func (r saleRepository) TxInsertSaleItems(ctx context.Context, tx pgx.Tx, saleId
 func (r saleRepository) SelectAllSales(ctx context.Context) ([]entity.Sale, error) {
 	var sales []entity.Sale
 
-	rows, err := r.db.Query(ctx, `SELECT s.id, s.sum, s.cashier_id, s.date FROM sales s`)
+	rows, err := r.db.Query(ctx, `SELECT s.id, s.sum, s.cashier_id, s.pay_type, s.refund, s.date FROM sales s`)
 	if err != nil {
 		return nil, entity.NewError(err, 500)
 	}
@@ -77,6 +87,8 @@ func (r saleRepository) SelectAllSales(ctx context.Context) ([]entity.Sale, erro
 			&sale.Id,
 			&sale.Sum,
 			&sale.CashierId,
+			&sale.PayType,
+			&sale.Refund,
 			&sale.Date,
 		)
 		if err != nil {

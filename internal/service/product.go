@@ -18,7 +18,7 @@ func NewProductService(productRepo entity.IProductRepository) entity.IProductSer
 }
 
 func (s productService) CreateProduct(ctx context.Context, product *entity.Product) (*entity.Product, error) {
-	if len(product.Barcode) == 0 {
+	if len(product.Barcode) != 13 {
 		tx, err := s.productRepo.GetTx(ctx)
 		if err != nil {
 			return nil, entity.NewError(err, 500)

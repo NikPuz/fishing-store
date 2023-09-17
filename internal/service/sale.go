@@ -36,7 +36,7 @@ func (s saleService) CreateSale(ctx context.Context, sales *entity.SaleDTO) erro
 		}
 	}
 
-	saleId, err := s.saleRepo.TxInsertSale(ctx, tx, &entity.Sale{Sum: sum, CashierId: sales.CashierId})
+	saleId, err := s.saleRepo.TxInsertSale(ctx, tx, &entity.Sale{Sum: sum, CashierId: sales.CashierId, PayType: sales.PayType, Refund: sales.Refund})
 	if err != nil {
 		return err
 	}
@@ -47,6 +47,16 @@ func (s saleService) CreateSale(ctx context.Context, sales *entity.SaleDTO) erro
 	}
 
 	err = tx.Commit(ctx)
+	if err != nil {
+		return entity.NewError(err, 500)
+	}
+
+	return nil
+}
+
+func (s saleService) UpdateSale(ctx context.Context, sale *entity.SaleDTO) error {
+
+	err := s.saleRepo.UpdateRefund(ctx, sale.Id, true)
 	if err != nil {
 		return entity.NewError(err, 500)
 	}
@@ -74,6 +84,8 @@ func (s saleService) ReadSales(ctx context.Context) ([]entity.SaleResponse, erro
 				Id:        sale.Id,
 				Sum:       sale.Sum,
 				CashierId: sale.CashierId,
+				PayType:   sale.PayType,
+				Refund:    sale.Refund,
 				Date:      sale.Date,
 				SaleItems: saleItems[sale.Id],
 			})

@@ -25,6 +25,7 @@ func RegisterSaleHandlers(r *chi.Mux, service entity.ISaleService, routerMiddlew
 		r.Use(routerMiddleware.ContentTypeJSON)
 
 		r.Post("/", routerMiddleware.RequestLogger(saleHandler.CreateSale))
+		r.Put("/", routerMiddleware.RequestLogger(saleHandler.UpdateSale))
 		r.Get("/", routerMiddleware.RequestLogger(saleHandler.ReadSales))
 	})
 }
@@ -55,6 +56,34 @@ func (h saleHandler) CreateSale(w http.ResponseWriter, r *http.Request) ([]byte,
 
 	w.WriteHeader(http.StatusCreated)
 	return nil, http.StatusCreated, nil
+}
+
+func (h saleHandler) UpdateSale(w http.ResponseWriter, r *http.Request) ([]byte, int, *entity.LogicError) {
+
+	var sales entity.SaleDTO
+	err := json.NewDecoder(r.Body).Decode(&sales)
+
+	if err != nil {
+		logicError := entity.NewLogicError(err, http.StatusBadRequest)
+		resp := logicError.JsonMarshal()
+		w.WriteHeader(logicError.Code)
+		w.Write(resp)
+		return resp, logicError.Code, logicError
+	}
+
+	err = h.saleService.UpdateSale(r.Context(), &sales)
+
+	// Обработка ошибки
+	if err != nil {
+		logicError := entity.ResponseLogicError(err)
+		resp := logicError.JsonMarshal()
+		w.WriteHeader(logicError.Code)
+		w.Write(resp)
+		return resp, logicError.Code, logicError
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return nil, http.StatusOK, nil
 }
 
 func (h saleHandler) ReadSales(w http.ResponseWriter, r *http.Request) ([]byte, int, *entity.LogicError) {

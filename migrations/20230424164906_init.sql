@@ -45,6 +45,8 @@ CREATE TABLE sales (
                           id SERIAL PRIMARY KEY,
                           sum int NOT NULL CHECK (sum > 0),
                           cashier_id int NOT NULL,
+                          pay_type varchar(64) NOT NULL,
+                          refund bool NOT NULL,
                           date timestamptz default current_timestamp
 );
 
